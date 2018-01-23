@@ -1,8 +1,10 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import os
+import config
+from api_handler import ApiHandler
 
-TOKEN = "380453482:AAHoxYjjKXH2XT1-Ub-3i0Imw7lIn_pXe8A"
+TOKEN = config.BOT_TOKEN
 PORT = int(os.environ.get('PORT', '8443'))
 
 # Enable logging
@@ -24,9 +26,11 @@ def help(bot, update):
     update.message.reply_text('Help!')
 
 
-def echo(bot, update):
-    """Echo the user message."""
-    update.message.reply_text(update.message.text)
+def process(bot, update):
+    """Process user message and give correct response."""
+    api_handler = ApiHandler()
+    msg = api_handler.get_response(update.message.text)
+    update.message.reply_text(msg)
 
 
 def error(bot, update, error):
@@ -47,7 +51,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    dp.add_handler(MessageHandler(Filters.text, process))
 
     # log all errors
     dp.add_error_handler(error)
