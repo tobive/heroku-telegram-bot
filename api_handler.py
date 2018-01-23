@@ -48,7 +48,7 @@ class ApiHandler:
                 vol = format_currency(obj['volume'])
 
         if market is not None:
-            available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market)
+            available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
 
         answer = """{available}
             Price : {price}\n
