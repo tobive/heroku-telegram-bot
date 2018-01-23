@@ -18,12 +18,12 @@ logger = logging.getLogger(__name__)
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    update.message.reply_text("Hi, I'm Crypto Price Bot! To ask about price just send the pairing you want to know, ex: btc-usd")
 
 
 def help(bot, update):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text("just send the pairing price you want to know. e.g. btc-idr ")
 
 
 def process(bot, update):
