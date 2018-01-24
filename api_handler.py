@@ -37,20 +37,18 @@ class ApiHandler:
         """"Return string of amount in currency format"""
         return '{:20,}'.format(float(amount))
 
-    def format_answer(self, res, market):
+    def format_answer(self, res, market=None):
         """Accept json from crypto API's response. Format answer and return as string."""
         available = "No specific market is available.\n"
         price = self.format_currency(res['ticker']['price'])
         vol = self.format_currency(res['ticker']['volume'])
-        for obj in res['ticker']['markets']:
-            if obj['market'] is not None:
+        if len(res['ticker']['markets']) > 0 and market:
+            for obj in res['ticker']['markets']:
                 if obj['market'].lower() == market.lower():
                     price = self.format_currency(obj['price'])
                     vol = self.format_currency(obj['volume'])
-
-        if market is not None:
-            available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
-
+                    available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
+            
         answer = """{available}
             Price : {price}\n
             Volume : {volume}\n
