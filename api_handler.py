@@ -35,7 +35,10 @@ class ApiHandler:
 
     def format_currency(self, amount, offset=False):
         """"Return string of amount in currency format"""
-        return '{:20,}'.format(float(amount))
+        if amount:
+            return '{:20,}'.format(float(amount))
+        else:
+            return 'not available'
 
     def format_answer(self, res, market=None):
         """Accept json from crypto API's response. Format answer and return as string."""
@@ -48,10 +51,10 @@ class ApiHandler:
                     price = self.format_currency(obj['price'])
                     vol = self.format_currency(obj['volume'])
                     available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
-            
+
         answer = """{available}
-            Price : {price}\n
+            Price ({target}) : {price}\n
             Volume : {volume}\n
-            """.format(available=available, price=price, volume=vol)
+            """.format(available=available, target=res['ticker']['target'], price=price, volume=vol)
 
         return answer

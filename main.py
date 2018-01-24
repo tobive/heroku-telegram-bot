@@ -18,13 +18,24 @@ logger = logging.getLogger(__name__)
 # update. Error handlers also receive the raised TelegramError object in error.
 def start(bot, update):
     """Send a message when the command /start is issued."""
-    update.message.reply_text("Hi, I'm Crypto Price Bot! To ask about price just send the pairing you want to know, e.g. btc-usd")
+    update.message.reply_text("""
+    Hi, I'm Crypto Price Bot!
+    To ask about price just send the pairing you want to know, e.g. btc-usd
+    To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
+    """)
 
 
 def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text("just send the pairing price you want to know. e.g. btc-idr ")
 
+def about(bot, update):
+    """Send a message when the command /about is issued."""
+    update.message.reply_text("""
+    CRYPTO PRICE BOT v1.0
+    Created by @tobive
+    Market data taken from api.cryptonator.com
+    """)
 
 def process(bot, update):
     """Process user message and give correct response."""
@@ -49,6 +60,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("about", about))
 
     # on noncommand i.e message - echo the message on Telegram
     dp.add_handler(MessageHandler(Filters.text, process))
