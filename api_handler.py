@@ -35,8 +35,12 @@ class ApiHandler:
 
     def format_currency(self, amount, offset=False):
         """"Return string of amount in currency format"""
-        if amount:
+        amount = 0 if amount is None else amount
+        sum = float(amount)
+        if sum > 0:
             return '{:20,}'.format(float(amount))
+        elif sum < 0: # satoshis
+            return format(sum, '.8f')
         else:
             return 'not available'
 
