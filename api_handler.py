@@ -17,7 +17,7 @@ class ApiHandler:
             res = self.request_api(pair)
             if res['success'] == True:
                 market = args[1] if len(args) == 2 else None
-                return format_answer(res, market)
+                return self.format_answer(res, market)
                 # return self.format_currency(res['ticker']['price'])
             else:
                 if res['error'] == 'Pair not found':
@@ -40,12 +40,12 @@ class ApiHandler:
     def format_answer(self, res, market):
         """Accept json from crypto API's response. Format answer and return as string."""
         available = "No specific market is available.\n"
-        price = format_currency(res['ticker']['price'])
-        vol = format_currency(res['ticker']['volume'])
+        price = self.format_currency(res['ticker']['price'])
+        vol = self.format_currency(res['ticker']['volume'])
         for obj in res['ticker']['markets']:
             if obj['market'].lower() == market.lower():
-                price = format_currency(obj['price'])
-                vol = format_currency(obj['volume'])
+                price = self.format_currency(obj['price'])
+                vol = self.format_currency(obj['volume'])
 
         if market is not None:
             available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
