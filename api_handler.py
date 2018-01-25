@@ -37,9 +37,9 @@ class ApiHandler:
         """"Return string of amount in currency format"""
         amount = 0 if amount is None else amount
         sum = float(amount)
-        if sum > 0:
-            return '{:20,}'.format(float(amount))
-        elif sum < 0: # satoshis
+        if sum > 1:
+            return '{:20,}'.format(float(amount)).replace(" ", "")
+        elif sum < 1 and sum > 0: # satoshis
             return format(amount, '.8f')
         else:
             return 'not available'
