@@ -18,7 +18,6 @@ class ApiHandler:
             if res['success'] == True:
                 market = args[1] if len(args) == 2 else None
                 return self.format_answer(res, market)
-                # return self.format_currency(res['ticker']['price'])
             else:
                 if res['error'] == 'Pair not found':
                     return 'Pair <{}> not found. Please try another pair'.format(text)
@@ -38,9 +37,9 @@ class ApiHandler:
         amount = 0 if amount is None else amount
         sum = float(amount)
         if sum > 1:
-            return '{:20,}'.format(float(amount)).replace(" ", "")
+            return '{:20,}'.format(sum).replace(" ", "")
         elif sum < 1 and sum > 0: # satoshis
-            return format(amount, '.8f')
+            return format(sum, '.8f')
         else:
             return 'not available'
 
