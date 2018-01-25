@@ -40,7 +40,7 @@ class ApiHandler:
         if sum > 0:
             return '{:20,}'.format(float(amount))
         elif sum < 0: # satoshis
-            return format(sum, '.8f')
+            return format(amount, '.8f')
         else:
             return 'not available'
 

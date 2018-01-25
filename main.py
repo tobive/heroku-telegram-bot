@@ -19,23 +19,26 @@ logger = logging.getLogger(__name__)
 def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text("""
-    Hi, I'm Crypto Price Bot!
-    To ask about price just send the pairing you want to know, e.g. btc-usd
-    To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
-    """)
+        Hi, I'm Crypto Price Bot!
+        To ask about price just send the pairing you want to know, e.g. btc-usd
+        To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
+        """)
 
 
 def help(bot, update):
     """Send a message when the command /help is issued."""
-    update.message.reply_text("just send the pairing price you want to know. e.g. btc-idr ")
+    update.message.reply_text("""
+        To ask about price just send the pairing you want to know, e.g. btc-usd
+        To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
+        """)
 
 def about(bot, update):
     """Send a message when the command /about is issued."""
     update.message.reply_text("""
-    CRYPTO PRICE BOT v1.0
-    Created by @tobive
-    Market data taken from api.cryptonator.com
-    """)
+        CRYPTO PRICE BOT v1.0
+        Created by @tobive
+        Market data taken from api.cryptonator.com
+        """)
 
 def process(bot, update):
     """Process user message and give correct response."""
