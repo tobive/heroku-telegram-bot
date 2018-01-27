@@ -34,7 +34,7 @@ class ApiHandler:
 
     def format_currency(self, amount, offset=False):
         """"Return string of amount in currency format"""
-        amount = 0 if amount is None else amount
+        amount = amount if amount else 0
         sum = float(amount)
         if sum > 1:
             return '{:20,}'.format(sum).replace(" ", "")
