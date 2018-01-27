@@ -13,6 +13,10 @@ class ApiHandler:
             args = text.split(' ')
             if len(args) > 2:
                 return 'Unrecognized command: <{}> Please see /help'.format(text)
+            if args[0] == 'market':
+                pair = args[1]
+                res = self.request_api(pair)
+                return self.list_markets(res)
             pair = args[0]
             res = self.request_api(pair)
             if res['success'] == True:
@@ -61,3 +65,12 @@ class ApiHandler:
             """.format(available=available, target=res['ticker']['target'], price=price, volume=vol)
 
         return answer
+
+    def list_markets(self, res):
+        """Returns string of available markets from response"""
+        if res['ticker']['markets'] == []:
+            return 'Sorry, no specific market is available'
+        the_list = []
+        for market in res['ticker']['markets']:
+            the_list.append(market['market'])
+        return ", ".join(the_list)
