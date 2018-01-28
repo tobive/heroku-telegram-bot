@@ -22,6 +22,7 @@ def start(bot, update):
         Hi, I'm Crypto Price Bot!
         To ask about price just send the pairing you want to know, e.g. btc-usd
         To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
+        For more command, ask /help
         """)
 
 
@@ -30,6 +31,7 @@ def help(bot, update):
     update.message.reply_text("""
         To ask about price just send the pairing you want to know, e.g. btc-usd
         To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
+        To list all available markets on a certain pairing, put the pairing after market, e.g. market xlm-btc
         """)
 
 def about(bot, update):
@@ -40,12 +42,16 @@ def about(bot, update):
         Market data taken from api.cryptonator.com
         """)
 
-def process(bot, update):
+def process_message(bot, update):
     """Process user message and give correct response."""
     api_handler = ApiHandler()
     msg = api_handler.get_response(update.message.text)
     update.message.reply_text(msg)
 
+def echo(bot, update):
+    """Echoing the message after command"""
+    msg = update.message.text.split(' ', 1)[1]
+    update.message.reply_text(msg)
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
@@ -64,9 +70,10 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("about", about))
+    dp.add_handler(CommandHandler("echo", echo))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, process))
+    dp.add_handler(MessageHandler(Filters.text, process_message))
 
     # log all errors
     dp.add_error_handler(error)

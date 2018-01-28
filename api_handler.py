@@ -28,7 +28,7 @@ class ApiHandler:
                 else:
                     return 'Sorry, request failed. Please try again later.'
         else:
-            return 'Unrecognized command: <{}> Please try again'.format(text)
+            return 'Unrecognized command: <{}> Please see /help'.format(text)
 
     def request_api(self, req):
         """Send request to api url, then return response in json."""
@@ -74,3 +74,7 @@ class ApiHandler:
         for market in res['ticker']['markets']:
             the_list.append(market['market'])
         return ", ".join(the_list)
+
+    def set_alarm(chat_id, pairing, direction, price):
+        """Set alarm on specific pairing based on input from chat_id."""
+        pass
