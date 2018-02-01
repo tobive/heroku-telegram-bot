@@ -1,5 +1,5 @@
-#config.py
-#this module took variables from env
+# config.py
+# this module took variables from env
 from os.path import join, dirname
 from os import environ
 from dotenv import load_dotenv

@@ -1,8 +1,9 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, Job, JobQueue
 import logging
 import os
 import config
 from api_handler import ApiHandler
+from db_handler import DbHandler
 
 TOKEN = config.BOT_TOKEN
 PORT = int(os.environ.get('PORT', '8443'))
@@ -60,6 +61,8 @@ def alarm(bot, update):
         Unrecognized command. Please use the following format:
         </alarm> <pairing> <below/over> <price>
         e.g. /alarm xrp-usd over 2.23
+        To list the registered alarms use the following command:
+        /alarm list
         """
     msg = update.message.text.split(' ', 1)
     if len(msg) == 1:
@@ -81,6 +84,23 @@ def alarm(bot, update):
         else:
             update.message.reply_text(err_msg)
 
+def price_logger(bot, update):
+    """Update the price database every 1 minute.
+    Check if price triggers one of the alarms and notifies user.
+    """
+    # print("--log the price--")
+    # print("--checking alarm..........")
+
+    # DB Handler checks for pairing list and triggered price list
+    db_controller = DbHandler()
+    alarm_list = db_controller.get_alarm_list()
+    pairing_list = alarm_list
+    # API Handler request new price for pairing list
+    # Function checks for triggered alarm, send notification
+    # DB Handler update db with data from API Handler
+
+
+
 def delete(bot, update):
     """Delete alarm from command. ID of the deleted thing is embedded in the command."""
     alarm_id = update.message.text.split('/del_alarm_')[1]
@@ -99,6 +119,11 @@ def main():
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
+
+    # Create job queue and alarm notifier job
+    # queue = JobQueue(updater)
+    # queue.run_repeating(price_logger, 10)
+    # queue.start()
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
