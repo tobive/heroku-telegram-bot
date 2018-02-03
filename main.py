@@ -59,8 +59,8 @@ def alarm(bot, update):
 
     err_msg = """
         Unrecognized command. Please use the following format:
-        </alarm> <pairing> <below/over> <price>
-        e.g. /alarm xrp-usd over 2.23
+        </alarm> <pairing> <below/above> <price>
+        e.g. /alarm xrp-usd above 2.23
         To list the registered alarms use the following command:
         /alarm list
         """
@@ -74,7 +74,7 @@ def alarm(bot, update):
         elif len(msg[1].split(' ')) == 3:
             cmd = msg[1].split(' ')
             try:
-                if '-' in cmd[0] and cmd[1].lower() in ['below', 'over'] and float(cmd[2]) > 0.0:
+                if '-' in cmd[0] and cmd[1].lower() in ['below', 'above'] and float(cmd[2]) > 0.0:
                     # ->add alarm
                     update.message.reply_text(" -- alarm added! -- ")
                 else:
@@ -140,9 +140,9 @@ def main():
     dp.add_error_handler(error)
 
     # Start the Bot
-    # updater.start_polling()
-    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook("https://tobi-telegram-bot.herokuapp.com/" + TOKEN)
+    updater.start_polling()
+    # updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
+    # updater.bot.set_webhook("https://tobi-telegram-bot.herokuapp.com/" + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since

@@ -3,3 +3,4 @@ venv
 __pycache__/
 test_db_handler.py
 test-mongo.py
+test_alarm_handler.py
