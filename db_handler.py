@@ -64,14 +64,14 @@ class DbHandler:
             return fail_msg
 
     def delete_alarm(self, delete_id):
-        """Delete alarm based on delete_id."""
+        """Delete alarm based on delete_id. Return boolean."""
         # delete record with delete_id
         result = self.db.alarms.delete_one({"delete_id": delete_id})
         # check result
         if result.deleted_count:
-            return "Successfully deleted alarm"
+            return True
         else:
-            return "Error. Failed to delete alarm"
+            return False
 
     def save_market_price(self, pairing, market, price, time):
         """Save or update current market price."""
@@ -127,7 +127,16 @@ class DbHandler:
         return list_pairing
 
     def get_alarms(self):
+        """Returns all alarms."""
         list_alarms = self.db.alarms.find({})
+        res = []
+        for alarm in list_alarms:
+            res.append(alarm)
+        return res
+
+    def get_alarms_from_id(self, chat_id):
+        """Returns list of alarms from chat_id."""
+        list_alarms = self.db.alarms.find({"chat_id": chat_id})
         res = []
         for alarm in list_alarms:
             res.append(alarm)

@@ -1,8 +1,7 @@
 import requests
 
 class ApiHandler:
-    """Parse given message and then request to Crypto API.
-        Send back response from Crypto API.
+    """Handles all things related to Crypto API.
     """
     def __init__(self):
         self.api_url = 'https://api.cryptonator.com/api/full/'
@@ -58,12 +57,10 @@ class ApiHandler:
                     price = self.format_currency(obj['price'])
                     vol = self.format_currency(obj['volume'])
                     available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
-
         answer = """{available}
             Price ({target}) : {price}\n
             Volume : {volume}\n
             """.format(available=available, target=res['ticker']['target'], price=price, volume=vol)
-
         return answer
 
     def list_markets(self, res):
@@ -75,6 +72,16 @@ class ApiHandler:
             the_list.append(market['market'])
         return ", ".join(the_list)
 
-    def set_alarm(chat_id, pairing, direction, price):
-        """Set alarm on specific pairing based on input from chat_id."""
-        pass
+    def notify_alarm(self, alarm_obj, TOKEN):
+        """Send to telegram api to notify the triggered alarm based on chat_id."""
+        telegram_url = "https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text=".format(
+            token=TOKEN,
+            chat_id=alarm_obj["chat_id"]
+        )
+        msg_string = """**ALARM TRIGGERED**.\nPair : {pair}\nMarket : {market}\nDirection : {direction}\nPrice : {price}""".format(
+            pair=alarm_obj["pairing"],
+            market=alarm_obj["market"],
+            direction=alarm_obj["direction"],
+            price=alarm_obj["price"]
+        )
+        res = requests.get(telegram_url + msg_string)

@@ -4,6 +4,7 @@ import os
 import config
 from api_handler import ApiHandler
 from db_handler import DbHandler
+from alarm_handler import AlarmHandler
 
 TOKEN = config.BOT_TOKEN
 PORT = int(os.environ.get('PORT', '8443'))
@@ -59,8 +60,9 @@ def alarm(bot, update):
 
     err_msg = """
         Unrecognized command. Please use the following format:
-        </alarm> <pairing> <below/above> <price>
-        e.g. /alarm xrp-usd above 2.23
+        </alarm> <pairing> <market/None> <below/above> <price>
+        e.g. /alarm xrp-usd bitfinex above 2.23
+        e.g. /alarm btc-usd below 8000
         To list the registered alarms use the following command:
         /alarm list
         """
@@ -70,42 +72,68 @@ def alarm(bot, update):
     else:
         if msg[1].lower() == 'list':
             # -> list alarms
-            update.message.reply_text(" --list the alarms-- ")
-        elif len(msg[1].split(' ')) == 3:
-            cmd = msg[1].split(' ')
-            try:
-                if '-' in cmd[0] and cmd[1].lower() in ['below', 'above'] and float(cmd[2]) > 0.0:
-                    # ->add alarm
-                    update.message.reply_text(" -- alarm added! -- ")
-                else:
-                    update.message.reply_text(err_msg)
-            except ValueError:
-                update.message.reply_text(err_msg)
+            db_handler = DbHandler()
+            list_alarms = db_handler.get_alarms_from_id(update.message.chat_id)
+            list_message = ""
+            for alarm in list_alarms:
+                market = "None" if alarm["market"] == '0' else alarm["market"]
+                list_message += """=====================\nPair : {pairing}\nMarket : {market}\nDirection : {direction}\nPrice : {price}\n\nTo delete this alarm, send:\n/del_alarm_{delete_id}\n=====================\n""".format(
+                            pairing=alarm["pairing"],
+                            market=market,
+                            direction=alarm["direction"],
+                            price=alarm["price"],
+                            delete_id=alarm["delete_id"]
+                            )
+            if list_message:
+                update.message.reply_text(list_message)
+            else:
+                update.message.reply_text("There is no alarm registered at the moment.")
         else:
-            update.message.reply_text(err_msg)
+            cmd = msg[1].split(' ')
+            if len(cmd) == 3 or len(cmd) == 4:
+                try:
+                    if len(cmd) == 4: # with market
+                        if '-' in cmd[0] and cmd[2].lower() in ['below', 'above'] and float(cmd[3]) > 0.0:
+                            # check if market specified
+                            market = '0' if cmd[1].lower() in ['none', 'no'] else cmd[1]
+                            # ->add alarm
+                            db_handler = DbHandler()
+                            res = db_handler.save_alarm(cmd[0], market, cmd[2], cmd[3], update.message.chat_id)
+                            update.message.reply_text(" -- alarm added! -- use </alarm list> to see all registered alarm")
+                        else:
+                            update.message.reply_text(err_msg)
+                    elif len(cmd) == 3: # no market
+                        if '-' in cmd[0] and cmd[1].lower() in ['below', 'above'] and float(cmd[2]) > 0.0:
+                            # ->add alarm
+                            db_handler = DbHandler()
+                            res = db_handler.save_alarm(cmd[0], "0", cmd[1], cmd[2], update.message.chat_id)
+                            update.message.reply_text(" -- alarm added! -- use </alarm list> to see all registered alarm")
+                        else:
+                            update.message.reply_text(err_msg)
+                    else:
+                        update.message.reply_text(err_msg)
+                except ValueError:
+                    update.message.reply_text(err_msg)
+            else:
+                update.message.reply_text(err_msg)
 
-def price_logger(bot, update):
+def alarm_manager(bot, update):
     """Update the price database every 1 minute.
     Check if price triggers one of the alarms and notifies user.
     """
-    # print("--log the price--")
-    # print("--checking alarm..........")
-
-    # DB Handler checks for pairing list and triggered price list
-    db_controller = DbHandler()
-    alarm_list = db_controller.get_alarm_list()
-    pairing_list = alarm_list
-    # API Handler request new price for pairing list
-    # Function checks for triggered alarm, send notification
-    # DB Handler update db with data from API Handler
-
+    alarm = update.context
+    alarm.run_manager()
 
 
 def delete(bot, update):
     """Delete alarm from command. ID of the deleted thing is embedded in the command."""
     alarm_id = update.message.text.split('/del_alarm_')[1]
-    # -> delete alarm
-    update.message.reply_text(" -- Alarm with ID {} deleted -- ".format(alarm_id))
+    db_handler = DbHandler()
+    status = db_handler.delete_alarm(alarm_id)
+    if status:
+        update.message.reply_text(" -- Alarm with ID {} deleted -- ".format(alarm_id))
+    else:
+        update.message.reply_text("Sorry, Problem has occured. Failed to delete alarm.")
 
 def error(bot, update, error):
     """Log Errors caused by Updates."""
@@ -121,9 +149,10 @@ def main():
     dp = updater.dispatcher
 
     # Create job queue and alarm notifier job
-    # queue = JobQueue(updater)
-    # queue.run_repeating(price_logger, 10)
-    # queue.start()
+    alarm_handler = AlarmHandler(TOKEN)
+    queue = JobQueue(updater)
+    queue.run_repeating(alarm_manager, 60, context=alarm_handler)
+    queue.start()
 
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
@@ -140,9 +169,9 @@ def main():
     dp.add_error_handler(error)
 
     # Start the Bot
-    updater.start_polling()
-    # updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    # updater.bot.set_webhook("https://tobi-telegram-bot.herokuapp.com/" + TOKEN)
+    # updater.start_polling()
+    updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
+    updater.bot.set_webhook("https://tobi-telegram-bot.herokuapp.com/" + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since

@@ -1,10 +1,12 @@
 from api_handler import ApiHandler
 from db_handler import DbHandler
+from time import sleep
 
 class AlarmHandler:
-    def __init__(self):
+    def __init__(self, TOKEN):
         self.db_handler = DbHandler()
         self.api_handler = ApiHandler()
+        self.TOKEN = TOKEN
 
     def run_manager(self):
         """Do all operations."""
@@ -20,6 +22,7 @@ class AlarmHandler:
             for alarm in list_alarm:
                 if alarm["pairing"] == pair:
                     list_new_price.append(self.fetch_price_market(alarm, json))
+            sleep(0.1)
         # Update/Add price in market_prices Collection
         for price in list_new_price:
             self.db_handler.save_market_price(**price)
@@ -31,6 +34,7 @@ class AlarmHandler:
             for alarm in list_alarm:
                 if id == alarm["_id"]:
                     # Notify user based on chat_id
+                    self.api_handler.notify_alarm(alarm, self.TOKEN)
                     print("notify chat_id : {}".format(alarm["chat_id"]))
                     # Delete triggered alarm, delete pairing-market in market_prices Collection
                     self.db_handler.delete_alarm(alarm["delete_id"])
@@ -68,3 +72,6 @@ class AlarmHandler:
                     if alarm["direction"] == 'below' and float(alarm["price"]) >= float(price["price"]):
                          res.append(alarm["_id"])
         return res
+
+    def echo_dummy(self):
+        print("###### ------- echo dummy ------ ######")
