@@ -1,5 +1,6 @@
 from pymongo import MongoClient, ReturnDocument
 import hashlib
+import config
 
 class DbHandler:
     """Connect to Mongo DB and handles the CRUD operations on database.
@@ -23,7 +24,7 @@ class DbHandler:
         }
     """
     def __init__(self):
-        client = MongoClient(port=27017)
+        client = MongoClient(config.MONGOLAB_URI)
         if client:
             self.db = client.crypto_price
         else:
