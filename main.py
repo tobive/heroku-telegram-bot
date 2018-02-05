@@ -1,4 +1,5 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, Job, JobQueue, ParseMode
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, Job, JobQueue
+from telegram import ParseMode
 import logging
 import os
 import config
