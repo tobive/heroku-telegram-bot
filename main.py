@@ -42,7 +42,7 @@ def about(bot, update):
     """Send a message when the command /about is issued."""
     update.message.reply_text("""
         *CRYPTO PRICE BOT v1.0*
-        Created by @evi_tama_la
+        Created by @evi\_tama\_la
         Market's data taken from _api.cryptonator.com_
         """, parse_mode=ParseMode.MARKDOWN)
 
@@ -61,8 +61,7 @@ def alarm(bot, update):
     """Put alarm based on pairing and price. Format: </alarm> <pairing> <direction> <price>"""
 
     err_msg = """
-        Unrecognized command. Please use the following format:
-        <*/alarm*> <*pairing*> <*market*/*None*> <*below*/*above*> <*price*>
+        Unrecognized command. Please use the following format:\n<*/alarm*> <*pairing*> <*market*/*None*> <*below*/*above*> <*price*>
         *e.g.* _/alarm xrp-usd bitfinex above 2.23_
         *e.g.* _/alarm btc-usd below 8000_
         To list the registered alarms use the following command:
@@ -79,7 +78,7 @@ def alarm(bot, update):
             list_message = ""
             for alarm in list_alarms:
                 market = "None" if alarm["market"] == '0' else alarm["market"]
-                list_message += """=====================\n```Pair   : {pairing}\nMarket    : {market}\nDirection : {direction}\nPrice     : {price}```\n\n_To delete this alarm, send:_\n/del_alarm_{delete_id}\n=====================\n""".format(
+                list_message += """=====================\n```\nPair   : {pairing}\nMarket    : {market}\nDirection : {direction}\nPrice     : {price}```\n_To delete this alarm, send:_ \n/del\_alarm\_{delete_id}\n=====================\n""".format(
                             pairing=alarm["pairing"],
                             market=market,
                             direction=alarm["direction"],

@@ -58,8 +58,7 @@ class ApiHandler:
                     vol = self.format_currency(obj['volume'])
                     available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
         answer = """{available}
-            ```Price ({target}) : {price}\n
-            Volume      : {volume}```\n
+            ```\nPrice ({target}) : {price}\nVolume      : {volume}```\n
             """.format(available=available, target=res['ticker']['target'], price=price, volume=vol)
         return answer
 
