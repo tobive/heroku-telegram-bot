@@ -58,8 +58,8 @@ class ApiHandler:
                     vol = self.format_currency(obj['volume'])
                     available = "Price of {base} in {market} Market\n".format(base=res['ticker']['base'], market=market)
         answer = """{available}
-            Price ({target}) : {price}\n
-            Volume : {volume}\n
+            ```Price ({target}) : {price}\n
+            Volume      : {volume}```\n
             """.format(available=available, target=res['ticker']['target'], price=price, volume=vol)
         return answer
 
@@ -78,7 +78,7 @@ class ApiHandler:
             token=TOKEN,
             chat_id=alarm_obj["chat_id"]
         )
-        msg_string = """**ALARM TRIGGERED**\n_Pair_ : {pair}\n_Market_ : {market}\n_Direction_ : {direction}\n_Price_ : {price}""".format(
+        msg_string = """* *ALARM TRIGGERED* *\n_Pair_ : {pair}\n_Market_ : {market}\n_Direction_ : {direction}\n_Price_ : {price}""".format(
             pair=alarm_obj["pairing"],
             market=alarm_obj["market"],
             direction=alarm_obj["direction"],

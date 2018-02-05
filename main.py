@@ -21,17 +21,17 @@ def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text("""
         Hi, I'm *Crypto Price Bot*!
-        To ask about price just send the pairing you want to know, e.g. btc-usd
-        To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
+        To ask about price just send the pairing you want to know, *e.g.* _btc-usd_
+        To ask a price in a specific market add market's name after the pairing, *e.g.* _btc-usd bitfinex_
         For more command, ask /help
         """, parse_mode=ParseMode.MARKDOWN)
 
 def help(bot, update):
     """Send a message when the command /help is issued."""
     update.message.reply_text("""
-        To ask about price just send the pairing you want to know, e.g. btc-usd
-        To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
-        To list all available markets on a certain pairing, put the pairing after market, e.g. market xlm-btc
+        To ask about price just send the pairing you want to know, *e.g.* _btc-usd_
+        To ask a price in a specific market add market's name after the pairing, *e.g.* _btc-usd bitfinex_
+        To list all available markets on a certain pairing, put the pairing after market, *e.g.* _market xlm-btc_
 
         * *Other available commands:* *
         /about - _version and bot's info_
@@ -41,36 +41,36 @@ def help(bot, update):
 def about(bot, update):
     """Send a message when the command /about is issued."""
     update.message.reply_text("""
-        CRYPTO PRICE BOT v1.0
+        *CRYPTO PRICE BOT v1.0*
         Created by @evi_tama_la
-        Market's data taken from api.cryptonator.com
-        """)
+        Market's data taken from _api.cryptonator.com_
+        """, parse_mode=ParseMode.MARKDOWN)
 
 def process_message(bot, update):
     """Process user message and give correct response."""
     api_handler = ApiHandler()
     msg = api_handler.get_response(update.message.text)
-    update.message.reply_text(msg)
+    update.message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
 def echo(bot, update):
     """Echoing the message after command."""
     msg = update.message.text.split(' ', 1)[1]
-    update.message.reply_text(msg)
+    update.message.reply_text(msg, parse_mode=ParseMode.MARKDOWN)
 
 def alarm(bot, update):
     """Put alarm based on pairing and price. Format: </alarm> <pairing> <direction> <price>"""
 
     err_msg = """
         Unrecognized command. Please use the following format:
-        </alarm> <pairing> <market/None> <below/above> <price>
-        e.g. /alarm xrp-usd bitfinex above 2.23
-        e.g. /alarm btc-usd below 8000
+        <*/alarm*> <*pairing*> <*market*/*None*> <*below*/*above*> <*price*>
+        *e.g.* _/alarm xrp-usd bitfinex above 2.23_
+        *e.g.* _/alarm btc-usd below 8000_
         To list the registered alarms use the following command:
-        /alarm list
+        <*/alarm list*>
         """
     msg = update.message.text.split(' ', 1)
     if len(msg) == 1:
-        update.message.reply_text(err_msg)
+        update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
     else:
         if msg[1].lower() == 'list':
             # -> list alarms
@@ -79,7 +79,7 @@ def alarm(bot, update):
             list_message = ""
             for alarm in list_alarms:
                 market = "None" if alarm["market"] == '0' else alarm["market"]
-                list_message += """=====================\nPair : {pairing}\nMarket : {market}\nDirection : {direction}\nPrice : {price}\n\nTo delete this alarm, send:\n/del_alarm_{delete_id}\n=====================\n""".format(
+                list_message += """=====================\n```Pair   : {pairing}\nMarket    : {market}\nDirection : {direction}\nPrice     : {price}```\n\n_To delete this alarm, send:_\n/del_alarm_{delete_id}\n=====================\n""".format(
                             pairing=alarm["pairing"],
                             market=market,
                             direction=alarm["direction"],
@@ -87,7 +87,7 @@ def alarm(bot, update):
                             delete_id=alarm["delete_id"]
                             )
             if list_message:
-                update.message.reply_text(list_message)
+                update.message.reply_text(list_message, parse_mode=ParseMode.MARKDOWN)
             else:
                 update.message.reply_text("There is no alarm registered at the moment.")
         else:
@@ -101,23 +101,23 @@ def alarm(bot, update):
                             # ->add alarm
                             db_handler = DbHandler()
                             res = db_handler.save_alarm(cmd[0], market, cmd[2], cmd[3], update.message.chat_id)
-                            update.message.reply_text(" -- alarm added! -- use </alarm list> to see all registered alarm")
+                            update.message.reply_text(" -- *alarm added!* -- use <_/alarm list_> to see all registered alarm.", parse_mode=ParseMode.MARKDOWN)
                         else:
-                            update.message.reply_text(err_msg)
+                            update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
                     elif len(cmd) == 3: # no market
                         if '-' in cmd[0] and cmd[1].lower() in ['below', 'above'] and float(cmd[2]) > 0.0:
                             # ->add alarm
                             db_handler = DbHandler()
                             res = db_handler.save_alarm(cmd[0], "0", cmd[1], cmd[2], update.message.chat_id)
-                            update.message.reply_text(" -- alarm added! -- use </alarm list> to see all registered alarm")
+                            update.message.reply_text(" -- *alarm added!* -- use <_/alarm list_> to see all registered alarm.", parse_mode=ParseMode.MARKDOWN)
                         else:
-                            update.message.reply_text(err_msg)
+                            update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
                     else:
-                        update.message.reply_text(err_msg)
+                        update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
                 except ValueError:
-                    update.message.reply_text(err_msg)
+                    update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
             else:
-                update.message.reply_text(err_msg)
+                update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
 
 def alarm_manager(bot, update):
     """Update the price database every 1 minute.
@@ -125,7 +125,6 @@ def alarm_manager(bot, update):
     """
     alarm = update.context
     alarm.run_manager()
-
 
 def delete(bot, update):
     """Delete alarm from command. ID of the deleted thing is embedded in the command."""
