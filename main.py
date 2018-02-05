@@ -1,4 +1,4 @@
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, Job, JobQueue
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, RegexHandler, Job, JobQueue, ParseMode
 import logging
 import os
 import config
@@ -32,15 +32,16 @@ def help(bot, update):
         To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
         To list all available markets on a certain pairing, put the pairing after market, e.g. market xlm-btc
 
-        * Other available commands: *
-        /about - version and bot's info
-        """)
+        * *Other available commands:* *
+        /about - _version and bot's info_
+        /alarm - _set alarm on certain pair when hitting a certain price_
+        """, parse_mode=ParseMode.MARKDOWN)
 
 def about(bot, update):
     """Send a message when the command /about is issued."""
     update.message.reply_text("""
         CRYPTO PRICE BOT v1.0
-        Created by @tobive
+        Created by @evi_tama_la
         Market's data taken from api.cryptonator.com
         """)
 

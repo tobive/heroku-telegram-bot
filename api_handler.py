@@ -74,11 +74,11 @@ class ApiHandler:
 
     def notify_alarm(self, alarm_obj, TOKEN):
         """Send to telegram api to notify the triggered alarm based on chat_id."""
-        telegram_url = "https://api.telegram.org/bot{token}/sendMessage?chat_id={chat_id}&text=".format(
+        telegram_url = "https://api.telegram.org/bot{token}/sendMessage?parse_mode=Markdown&chat_id={chat_id}&text=".format(
             token=TOKEN,
             chat_id=alarm_obj["chat_id"]
         )
-        msg_string = """**ALARM TRIGGERED**.\nPair : {pair}\nMarket : {market}\nDirection : {direction}\nPrice : {price}""".format(
+        msg_string = """**ALARM TRIGGERED**\n_Pair_ : {pair}\n_Market_ : {market}\n_Direction_ : {direction}\n_Price_ : {price}""".format(
             pair=alarm_obj["pairing"],
             market=alarm_obj["market"],
             direction=alarm_obj["direction"],
