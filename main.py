@@ -20,11 +20,11 @@ logger = logging.getLogger(__name__)
 def start(bot, update):
     """Send a message when the command /start is issued."""
     update.message.reply_text("""
-        Hi, I'm Crypto Price Bot!
+        Hi, I'm *Crypto Price Bot*!
         To ask about price just send the pairing you want to know, e.g. btc-usd
         To ask a price in a specific market add market's name after the pairing, e.g. btc-usd bitfinex
         For more command, ask /help
-        """)
+        """, parse_mode=ParseMode.MARKDOWN)
 
 def help(bot, update):
     """Send a message when the command /help is issued."""
