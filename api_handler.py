@@ -29,10 +29,11 @@ class ApiHandler:
         else:
             return 'Unrecognized command: <{}> Please see /help'.format(text)
 
-    def request_api(self, req):
+    def request_api(self, pair):
         """Send request to api url, then return response in json."""
-        res = requests.get(self.api_url + req)
+        res = requests.get(self.api_url + pair)
         print("getting response from crypto api...")
+        # print(res.json())
         return res.json()
 
     def format_currency(self, amount, offset=False):
@@ -71,13 +72,20 @@ class ApiHandler:
             the_list.append(market['market'])
         return ", ".join(the_list)
 
+    def is_market_available(self, res, market):
+        """Return boolean of whether a market is available on certain pairing."""
+        for target in res['ticker']['markets']:
+            if market.lower() == target["market"].lower():
+                return True
+        return False
+
     def notify_alarm(self, alarm_obj, TOKEN):
         """Send to telegram api to notify the triggered alarm based on chat_id."""
         telegram_url = "https://api.telegram.org/bot{token}/sendMessage?parse_mode=Markdown&chat_id={chat_id}&text=".format(
             token=TOKEN,
             chat_id=alarm_obj["chat_id"]
         )
-        msg_string = """* *ALARM TRIGGERED* *\n_Pair_ : {pair}\n_Market_ : {market}\n_Direction_ : {direction}\n_Price_ : {price}""".format(
+        msg_string = """* **ALARM TRIGGERED** *\n_Pair_ : {pair}\n_Market_ : {market}\n_Direction_ : {direction}\n_Price_ : {price}""".format(
             pair=alarm_obj["pairing"],
             market=alarm_obj["market"],
             direction=alarm_obj["direction"],

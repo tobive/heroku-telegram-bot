@@ -78,6 +78,11 @@ class TestApiHandler(unittest.TestCase):
         }
         self.assertEqual(self.bot.list_markets(obj), "BitFinex, Kraken")
 
+    def test_is_market_available(self):
+        res = self.bot.request_api("btc-usd")
+        self.assertEqual(self.bot.is_market_available(res, "Kraken"), True)
+        self.assertEqual(self.bot.is_market_available(res, "Kleleken"), False)
+
 
 if __name__ == '__main__':
     unittest.main()

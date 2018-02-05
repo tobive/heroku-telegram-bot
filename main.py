@@ -78,7 +78,7 @@ def alarm(bot, update):
             list_message = ""
             for alarm in list_alarms:
                 market = "None" if alarm["market"] == '0' else alarm["market"]
-                list_message += """=====================\n```\nPair   : {pairing}\nMarket    : {market}\nDirection : {direction}\nPrice     : {price}```\n_To delete this alarm, send:_ \n/del\_alarm\_{delete_id}\n=====================\n""".format(
+                list_message += """*=====================*\n```\nPair      : {pairing}\nMarket    : {market}\nDirection : {direction}\nPrice     : {price}```\n_To delete this alarm, send:_ \n/del\_alarm\_{delete_id}\n*=====================*\n""".format(
                             pairing=alarm["pairing"],
                             market=market,
                             direction=alarm["direction"],
@@ -91,32 +91,42 @@ def alarm(bot, update):
                 update.message.reply_text("There is no alarm registered at the moment.")
         else:
             cmd = msg[1].split(' ')
-            if len(cmd) == 3 or len(cmd) == 4:
-                try:
-                    if len(cmd) == 4: # with market
-                        if '-' in cmd[0] and cmd[2].lower() in ['below', 'above'] and float(cmd[3]) > 0.0:
-                            # check if market specified
-                            market = '0' if cmd[1].lower() in ['none', 'no'] else cmd[1]
-                            # ->add alarm
-                            db_handler = DbHandler()
-                            res = db_handler.save_alarm(cmd[0], market, cmd[2], cmd[3], update.message.chat_id)
-                            update.message.reply_text(" -- *alarm added!* -- use <_/alarm list_> to see all registered alarm.", parse_mode=ParseMode.MARKDOWN)
-                        else:
-                            update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
-                    elif len(cmd) == 3: # no market
-                        if '-' in cmd[0] and cmd[1].lower() in ['below', 'above'] and float(cmd[2]) > 0.0:
-                            # ->add alarm
-                            db_handler = DbHandler()
-                            res = db_handler.save_alarm(cmd[0], "0", cmd[1], cmd[2], update.message.chat_id)
-                            update.message.reply_text(" -- *alarm added!* -- use <_/alarm list_> to see all registered alarm.", parse_mode=ParseMode.MARKDOWN)
-                        else:
-                            update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
-                    else:
-                        update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
-                except ValueError:
-                    update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
+            # Check if pairing valid
+            api_handler = ApiHandler()
+            res = api_handler.request_api(cmd[0])
+            if res['error'] == 'Pair not found':
+                update.message.reply_text("Sorry, Pairing is not available.")
             else:
-                update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
+                if len(cmd) == 3 or len(cmd) == 4:
+                    try:
+                        if len(cmd) == 4: # with market
+                            if '-' in cmd[0] and cmd[2].lower() in ['below', 'above'] and float(cmd[3]) > 0.0:
+                                # check if market available or none specified
+                                in_markets = api_handler.is_market_available(res, cmd[1])
+                                market = '0' if cmd[1].lower() in ['none', 'no'] else cmd[1]
+                                if market == '0' or in_markets:
+                                    # ->add alarm
+                                    db_handler = DbHandler()
+                                    res = db_handler.save_alarm(cmd[0], market, cmd[2], cmd[3], update.message.chat_id)
+                                    update.message.reply_text(" -- *alarm added!* -- use <_/alarm list_> to see all registered alarm.", parse_mode=ParseMode.MARKDOWN)
+                                else: # market is not available
+                                    update.message.reply_text('market <{}> is not available.'.format(market))
+                            else:
+                                update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
+                        elif len(cmd) == 3: # no market
+                            if '-' in cmd[0] and cmd[1].lower() in ['below', 'above'] and float(cmd[2]) > 0.0:
+                                # ->add alarm
+                                db_handler = DbHandler()
+                                res = db_handler.save_alarm(cmd[0], "0", cmd[1], cmd[2], update.message.chat_id)
+                                update.message.reply_text(" -- *alarm added!* -- use <_/alarm list_> to see all registered alarm.", parse_mode=ParseMode.MARKDOWN)
+                            else:
+                                update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
+                        else:
+                            update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
+                    except ValueError:
+                        update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
+                else:
+                    update.message.reply_text(err_msg, parse_mode=ParseMode.MARKDOWN)
 
 def alarm_manager(bot, update):
     """Update the price database every 1 minute.
