@@ -34,8 +34,7 @@ class ApiHandler:
         try:
             res = requests.get(self.api_url + pair)
             print("getting response from crypto api...")
-        except requests.ConnectionError as e:
-            print # coding=utf-8
+        except:
             return {'success' : False}
         # print(res.json())
         return res.json()
