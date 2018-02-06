@@ -96,6 +96,8 @@ def alarm(bot, update):
             res = api_handler.request_api(cmd[0])
             if res['error'] == 'Pair not found':
                 update.message.reply_text("Sorry, Pairing is not available.")
+            elif res['success'] == False:
+                update.message.reply_text("Problem with server or pairing not found. Please try again later.")
             else:
                 if len(cmd) == 3 or len(cmd) == 4:
                     try:

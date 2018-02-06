@@ -72,6 +72,3 @@ class AlarmHandler:
                     if alarm["direction"] == 'below' and float(alarm["price"]) >= float(price["price"]):
                          res.append(alarm["_id"])
         return res
-
-    def echo_dummy(self):
-        print("###### ------- echo dummy ------ ######")

@@ -31,8 +31,12 @@ class ApiHandler:
 
     def request_api(self, pair):
         """Send request to api url, then return response in json."""
-        res = requests.get(self.api_url + pair)
-        print("getting response from crypto api...")
+        try:
+            res = requests.get(self.api_url + pair)
+            print("getting response from crypto api...")
+        except requests.ConnectionError as e:
+            print # coding=utf-8
+            return {'success' : False}
         # print(res.json())
         return res.json()
 
@@ -65,7 +69,7 @@ class ApiHandler:
 
     def list_markets(self, res):
         """Returns string of available markets from response"""
-        if res['ticker']['markets'] == []:
+        if res['ticker']['markets'] == [] or res["success"] == False:
             return 'Sorry, no specific market is available'
         the_list = []
         for market in res['ticker']['markets']:
