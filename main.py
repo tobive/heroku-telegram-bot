@@ -8,6 +8,7 @@ from db_handler import DbHandler
 from alarm_handler import AlarmHandler
 
 TOKEN = config.BOT_TOKEN
+WEBHOOK = config.WEBHOOK
 PORT = int(os.environ.get('PORT', '8443'))
 
 # Enable logging
@@ -23,7 +24,7 @@ def start(bot, update):
         Hi, I'm *Crypto Price Bot*!
         To ask about price just send the pairing you want to know, *e.g.* _btc-usd_
         To ask a price in a specific market add market's name after the pairing, *e.g.* _btc-usd bitfinex_
-        For more command, ask /help
+        For more info and command, ask /help
         """, parse_mode=ParseMode.MARKDOWN)
 
 def help(bot, update):
@@ -34,16 +35,27 @@ def help(bot, update):
         To list all available markets on a certain pairing, put the pairing after market, *e.g.* _market xlm-btc_
 
         * *Other available commands:* *
-        /about - _version and bot's info_
+        /about - _version, bot's info & user agreement_
         /alarm - _set alarm on certain pair when hitting a certain price_
         """, parse_mode=ParseMode.MARKDOWN)
 
 def about(bot, update):
     """Send a message when the command /about is issued."""
     update.message.reply_text("""
-        *CRYPTO PRICE BOT v1.0*
-        Created by @evi\_tama\_la
+        *CRYPTO PRICE BOT v1.0.0*
+
         Market's data taken from _api.cryptonator.com_
+        Cryptocurrency rates based on the data provided.
+        We don't guarantee the accuracy of the displayed rates,
+        and we won't take any responsibility for any action
+        the user get by using our bot.
+        _Warning:_
+        Cryptocurrency is a highly volatile product and trading
+        is a very risky investment.
+        Trade at your own risk.
+
+        _Created by_ @evi\_tama\_la
+        _2018_
         """, parse_mode=ParseMode.MARKDOWN)
 
 def process_message(bot, update):
@@ -96,7 +108,7 @@ def alarm(bot, update):
             res = api_handler.request_api(cmd[0])
             if res['error'] == 'Pair not found':
                 update.message.reply_text("Sorry, Pairing is not available.")
-            elif res['success'] == False:
+            elif res['success'] == 'false':
                 update.message.reply_text("Problem with server or pairing not found. Please try again later.")
             else:
                 if len(cmd) == 3 or len(cmd) == 4:
@@ -183,7 +195,7 @@ def main():
     # Start the Bot
     # updater.start_polling()
     updater.start_webhook(listen="0.0.0.0", port=PORT, url_path=TOKEN)
-    updater.bot.set_webhook("https://tobi-telegram-bot.herokuapp.com/" + TOKEN)
+    updater.bot.set_webhook(WEBHOOK + TOKEN)
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
