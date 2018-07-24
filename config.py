@@ -9,3 +9,4 @@ load_dotenv(dotenv_path)
 
 BOT_TOKEN = environ.get('BOT_TOKEN')
 MONGOLAB_URI = environ.get('MONGOLAB_URI')
+WEBHOOK = environ.get('WEBHOOK')
